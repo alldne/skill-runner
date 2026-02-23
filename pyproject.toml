@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skill-runner"
-version = "0.1.1"
+version = "0.1.2"
 description = "Minimal headless agent that executes skill.md files via OpenAI-compatible Chat Completion API"
 readme = "README.md"
 license = "MIT"
@@ -24,6 +24,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/alldne/skill-runner"
+Repository = "https://github.com/alldne/skill-runner"
 
 [project.scripts]
 skill-runner = "skill_runner.__main__:main"
