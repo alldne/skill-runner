@@ -1,0 +1,50 @@
+# Example GitHub Actions workflow for AI-powered PR code review.
+# Copy this to .github/workflows/ai-review.yml in your repository.
+
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install skill-runner
+        run: pip install ./projects/skill-runner
+
+      - name: Generate diff
+        run: git diff origin/main...HEAD > /tmp/diff.txt
+
+      - name: Run AI review
+        run: |
+          python -m skill_runner \
+            --skill projects/skill-runner/skills/code-review.md \
+            --input /tmp/diff.txt \
+            --output /tmp/review.json
+        env:
+          SKILL_RUNNER_BASE_URL: ${{ secrets.LLM_API_BASE_URL }}
+          SKILL_RUNNER_API_KEY: ${{ secrets.LLM_API_KEY }}
+          SKILL_RUNNER_MODEL: ${{ secrets.LLM_MODEL }}
+
+      - name: Post review comment
+        if: always()
+        run: |
+          if [ -f /tmp/review.json ]; then
+            echo "## AI Code Review" > /tmp/comment.md
+            echo '```json' >> /tmp/comment.md
+            cat /tmp/review.json >> /tmp/comment.md
+            echo '```' >> /tmp/comment.md
+            gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/comment.md
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
