@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skill-runner"
-version = "0.1.2"
+version = "0.1.3"
 description = "Minimal headless agent that executes skill.md files via OpenAI-compatible Chat Completion API"
 readme = "README.md"
 license = "MIT"
